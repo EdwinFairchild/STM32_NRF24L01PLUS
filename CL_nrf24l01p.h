@@ -150,12 +150,17 @@
 #define FOUR_BYTES  0b10
 #define FIVE_BYTES  0b11
 
+#define DUMMYBYTE  0xF1
 
 //generic function pointer for a function with no  return and no argumetns
 typedef   void(*fptr)(); 
-
+typedef	void(*spiSend_ptr)(uint8_t data);
+typedef	void(*spiSednMultiByte_ptr)(uint8_t * data, uint32_t len, uint8_t *rx_buff);	
+typedef uint8_t(*getStatus_ptr)();
+typedef uint8_t(*spiRead_ptr)();
 
 //------------------------------------------------------------------------
+//							NRF TX TYPE
 //------------------------------------------------------------------------
 
 
@@ -203,45 +208,51 @@ CL_nrf_tx nrfTX;
 
 
 //------------------------------------------------------------------------
+//						NRF RX TYPE
 //------------------------------------------------------------------------
-
-
-
+typedef	void(*rx_data_ptr)(uint8_t *data, uint8_t len); 
+typedef  void(*rx_set_addr_ptr)(uint8_t rx_pipe, uint32_t addr_high, uint8_t addr_low); 
 typedef struct //user structure to setup transmitter
 {
-	bool	enable_crc;
-	bool	enable_auto_ack;
+	bool		set_enable_crc;
+	bool		set_enable_auto_ack;	
+	uint8_t		set_crc_scheme;	
+	uint8_t		set_address_width;
+	uint8_t		set_payload_width;
+	uint8_t		set_rx_addr_byte_1;
+	uint32_t	set_rx_addr_byte_2_5;
+	bool		set_enable_rx_dr_interrupt;
+	uint8_t		set_rx_pipe;
+	uint8_t		set_rf_channel;
 	
-	uint8_t crc_scheme;
+	fptr					cmd_clear_interrupts;
+	getStatus_ptr			cmd_get_status;
+	rx_set_addr_ptr			cmd_set_addr;
+	fptr					cmd_listen;  
+	rx_data_ptr				cmd_read_payload;
 	
-	uint8_t address_width;
-	uint8_t payload_width;
 	
-	//these will be assembled pewer datawidth setting
-	uint8_t tx_addr_byte_1;
-	uint32_t tx_addr_byte_2_5;
-
-	bool enable_rx_dr_interrupt;
-	uint8_t rx_pipe;
-	uint8_t rf_channel;
+	spiSend_ptr				spi_spiSend;
+	spiSednMultiByte_ptr	spi_spiSendMultiByte;
+	spiRead_ptr				spi_spiRead;
 
 }CL_nrf24l01p_init_rx_type;
 
 
 
 // will use this for the read rx payload function
-typedef  void(*rx_data_ptr)(uint8_t *data, uint8_t len); 
-
-
+ 
 typedef struct //user structure to control transmitter
 {
 
-	fptr clear_interrupts;
-	fptr get_status;
-	tx_set_addr_ptr set_addr;
-	fptr listen; //use generic pointer for this
-	rx_data_ptr read_payload;
-	
+	//fptr clear_interrupts;
+	//fptr get_status;
+//	tx_set_addr_ptr set_addr;
+//	fptr listen; //use generic pointer for this
+//	rx_data_ptr read_payload;
+	spiSend_ptr spiSend;
+	spiSednMultiByte_ptr speSendMultiByte;
+	spiRead_ptr				spiRead;
 }CL_nrf_rx;
 
 CL_nrf_rx nrfRX;

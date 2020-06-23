@@ -59,15 +59,15 @@ uint8_t tx_data_buff[32];
 uint8_t rx_data_buff[32];
 
 uint8_t multibyte_buff[10] = { 0 };
-uint8_t DUMMYBYTE = 0xFF;
+//uint8_t DUMMYBYTE = 0xFF;
 
 
 uint8_t flag = 0x00;
 //-----------| Prototypes |-----------
 void init_pins(void);
 void init_spi1(void);
-void spiSendMultiDummy(uint32_t len, uint8_t *buff);
-void spiSendMultiData(uint8_t * data, uint32_t len);
+
+void spiSendMultiByte(uint8_t * data_to_send, uint32_t len, uint8_t *rx_buffer);
 void spiSend(uint8_t  data);
 uint8_t spiRead(void);
 void printRegister(uint8_t reg);
@@ -79,8 +79,8 @@ void printRegister(uint8_t reg);
 //------------| Debug stuff |----------
 void init_debug_led(void);
 void blinkLed(void);
-#define BETX
-//#define BERX
+//#define BETX
+#define BERX
 
 
 /* ______________________________________________________________ */
@@ -97,8 +97,9 @@ int main(void)
 	init_spi1();
 	NRF_CSN_HIGH();
 	NRF_CE_LOW();
-	NRF_cmd_FLUSH_TX();
-	NRF_cmd_FLUSH_RX();
+	
+
+
 
 
 	
@@ -115,6 +116,7 @@ int main(void)
 	myNRF.enable_max_rt_interrupt = true;
 	myNRF.enable_tx_ds_interrupt = true;
 	myNRF.rf_channel = 0x7B;
+	
 	NRF_init_tx(&myNRF);
 
 
@@ -131,19 +133,23 @@ int main(void)
 	
 	
 	CL_nrf24l01p_init_rx_type myRX;
-	myRX.address_width = FIVE_BYTES;
-	myRX.crc_scheme = 0;
-	myRX.enable_auto_ack = true;
-	myRX.enable_crc = true;
-	myRX.enable_rx_dr_interrupt = true;
-	myRX.rx_pipe = RX_PIPE_5;
-	myRX.tx_addr_byte_1 = 0x28;
-	myRX.tx_addr_byte_2_5 = 0xAABBCCDD;
-	myRX.rf_channel = 0x7B;
-	myRX.payload_width = 18;
+	myRX.set_address_width = FIVE_BYTES;
+	myRX.set_crc_scheme = 0;
+	myRX.set_enable_auto_ack = true;
+	myRX.set_enable_crc = true;
+	myRX.set_enable_rx_dr_interrupt = true;
+	myRX.set_rx_pipe = RX_PIPE_5;
+	myRX.set_rx_addr_byte_1 = 0x28;
+	myRX.set_rx_addr_byte_2_5 = 0xAABBCCDD;
+	myRX.set_rf_channel = 0x7B;
+	myRX.set_payload_width = 2;	
+	myRX.spi_spiSend = &spiSend;
 	NRF_init_rx(&myRX);
 	
-	nrfRX.listen();
+	
+	
+	myRX.cmd_listen();
+	 
 	
 
 #endif
@@ -181,14 +187,16 @@ int main(void)
 				{			
 					flag = 0x00;					
 					NRF_cmd_modify_reg(NRF_STATUS, RX_DR, 1);								
-				  	NRF_cmd_read_RX_PAYLOAD(rx_data_buff, 18);
+					//NRF_cmd_read_RX_PAYLOAD(rx_data_buff, 2);
+					myRX.cmd_read_payload(rx_data_buff, 2);
 					NRF_cmd_FLUSH_RX();					
-					for(int i = 0 ; i < 19 ; i++)
+					for(int i = 0 ; i < 2 ; i++)
 					{
-						CL_printMsg(" %c", rx_data_buff[i]);
+						CL_printMsg(" %d ", rx_data_buff[i]);
 						rx_data_buff[i] = 0;
 					}
-					nrfRX.listen();					
+					CL_printMsg("\n-\n");
+					myRX.cmd_listen();					
 				}
 		#endif
 		
@@ -230,7 +238,7 @@ void printRegister(uint8_t reg)
 /* ______________________________________________________________ */
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  Hardware specific functions   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-void spiSendMultiDummy( uint32_t len , uint8_t *buff) 
+void spiSendMultiDummy(  uint8_t *buff,uint32_t len ) 
 {
 	//when you are sending dummybytes its because youre
 	//interested in the response hence they replies are
@@ -250,7 +258,7 @@ void spiSendMultiDummy( uint32_t len , uint8_t *buff)
 
 }
 /* ______________________________________________________________ */
-void spiSendMultiData(uint8_t * data, uint32_t len)
+void spiSendMultiByte(uint8_t * data_to_send, uint32_t len, uint8_t *rx_buffer)
 { 
 	//consider what to do with returned bytes usually when 
 	//sending data returned bytes are not needed 
@@ -259,12 +267,12 @@ void spiSendMultiData(uint8_t * data, uint32_t len)
 	for(uint8_t i = 0 ; i < len ; i++)
 	{		
 		
-		NRF_SPI->DR = *data++;
+		NRF_SPI->DR = *data_to_send++;
+	   //if you mcu is really fast you might want to the the chekc busy flag code here	
+		rx_buffer[i] = spiRead();
 		
-		
-		//spiRead();
-		//len--;
-		while (NRF_SPI->SR & SPI_SR_BSY) ;	
+
+		while (NRF_SPI->SR & SPI_SR_BSY) ;	//this is the check busy flag code
 	
 		
 	}

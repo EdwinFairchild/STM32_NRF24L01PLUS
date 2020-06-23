@@ -50,6 +50,9 @@ void CL_printMsg_init(printMsg_config_Type config)
 	config.Uart_instance->CR1 |= USART_CR1_UE;	
 }
 
+
+
+
 void CL_printMsg_init_Default(bool fullDuplex)
 {
 	RCC->APB2ENR |= RCC_APB2ENR_AFIOEN;  //alternate fucntion periph clock enable
@@ -63,6 +66,11 @@ void CL_printMsg_init_Default(bool fullDuplex)
 	USART1->CR1 |=  USART_CR1_TE;
 	USART1->CR1 |= USART_CR1_UE;
 }
+
+
+
+
+
 void CL_printMsg(char *msg, ...)
 {	
 	char buff[150];	
