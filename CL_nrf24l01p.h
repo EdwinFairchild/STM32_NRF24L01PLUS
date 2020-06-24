@@ -44,11 +44,11 @@
 #define W_TX_PAYLOAD		0xA0
 #define FLUSH_TX			0xE1
 #define FLUSH_RX			0xE2
-#define REUSE_TX_PL			0xE3
+#define REUSE_TX_PL			0xE3 //unused as of now
 #define R_RX_PL_WID			0x60
-#define W_ACK_PAYLOAD		0xA8 //0b10101xxx where xxx is pipe number valid from 000 to 101 (0 to 5)
+#define W_ACK_PAYLOAD		0xA8 //unused as of now
 #define NOP					0xFF
-#define W_TX_PAYLOAD_NACK	0xB0
+#define W_TX_PAYLOAD_NACK	0xB0 // will implement soon
 
 //-----------| NRF REGISTERS |----------
 #define REGISTER_MASK 0x1F
@@ -153,90 +153,57 @@
 #define DUMMYBYTE  0xF1
 
 //generic function pointer for a function with no  return and no argumetns
-typedef   void(*fptr)(); 
-typedef	void(*spiSend_ptr)(uint8_t data);
-typedef	void(*spiSednMultiByte_ptr)(uint8_t * data, uint32_t len, uint8_t *rx_buff);	
-typedef uint8_t(*getStatus_ptr)();
-typedef uint8_t(*spiRead_ptr)();
+typedef		void(*fptr)(); 
+typedef		void(*spiSend_ptr)(uint8_t data);
+typedef		void(*spiSednMultiByte_ptr)(uint8_t * data, uint32_t len, uint8_t *rx_buff);	
+typedef		void(*actAsRx_ptr)(bool state);
+typedef		void(*tx_data_ptr)(uint8_t *data, uint8_t len); 
+typedef		void(*tx_set_addr_ptr)(uint32_t addr_high , uint8_t addr_low); 
+typedef		void(*rx_data_ptr)(uint8_t *data, uint8_t len); 
+typedef		void(*rx_set_addr_ptr)(uint8_t rx_pipe, uint32_t addr_high, uint8_t addr_low); 
+typedef		uint8_t(*getStatus_ptr)();
+typedef		uint8_t(*spiRead_ptr)();
 
-//------------------------------------------------------------------------
-//							NRF TX TYPE
-//------------------------------------------------------------------------
-
-
-
-typedef struct //user structure to setup transmitter
-{
-	bool	enable_crc;
-	bool	enable_auto_ack;
-	
-	uint8_t crc_scheme;
-	
-	uint8_t address_width;
-	
-	//these will be assembled pewer datawidth setting
-	uint8_t tx_addr_byte_1;
-	uint32_t tx_addr_byte_2_5;
-
-	bool enable_tx_ds_interrupt;
-	bool enable_max_rt_interrupt;
-	uint8_t rf_channel;
-
-
-}CL_nrf24l01p_init_tx_type;
-
-
-
-//this will be used to point to transmit payload function
-typedef  void(*tx_data_ptr)(uint8_t *data, uint8_t len); 
-
-//this will be used to point to set address function
-typedef   void(*tx_set_addr_ptr)(uint32_t addr_high , uint8_t addr_low); 
-
-
-typedef struct //user structure to control transmitter
-{
-
-	fptr clear_interrupts;
-	fptr get_status;
-	tx_set_addr_ptr set_addr;
-	tx_data_ptr transmit;
-
-}CL_nrf_tx;
-
-CL_nrf_tx nrfTX;
-
-
-//------------------------------------------------------------------------
-//						NRF RX TYPE
-//------------------------------------------------------------------------
-typedef	void(*rx_data_ptr)(uint8_t *data, uint8_t len); 
-typedef  void(*rx_set_addr_ptr)(uint8_t rx_pipe, uint32_t addr_high, uint8_t addr_low); 
 typedef struct //user structure to setup transmitter
 {
 	bool		set_enable_crc;
-	bool		set_enable_auto_ack;	
 	uint8_t		set_crc_scheme;	
-	uint8_t		set_address_width;
-	uint8_t		set_payload_width;
-	uint8_t		set_rx_addr_byte_1;
-	uint32_t	set_rx_addr_byte_2_5;
-	bool		set_enable_rx_dr_interrupt;
-	uint8_t		set_rx_pipe;
+	bool		set_enable_auto_ack;	
 	uint8_t		set_rf_channel;
 	
+	bool		set_enable_rx_mode;	
+	uint8_t		set_rx_pipe;
+	uint8_t		set_address_width;
+	uint8_t		set_rx_addr_byte_1;
+	uint32_t	set_rx_addr_byte_2_5;
+	uint8_t		set_payload_width;
+	bool		set_enable_rx_dr_interrupt;
+	
+	bool		set_enable_tx_mode;	
+	uint8_t		set_tx_addr_byte_1;
+	uint32_t	set_tx_addr_byte_2_5;	
+	bool		set_enable_max_rt_interrupt;
+	bool		set_enable_tx_ds_interrupt;
+	
+		
 	fptr					cmd_clear_interrupts;
 	getStatus_ptr			cmd_get_status;
-	rx_set_addr_ptr			cmd_set_addr;
+	rx_set_addr_ptr			cmd_set_rx_addr;
+	tx_set_addr_ptr			cmd_set_tx_addr;
 	fptr					cmd_listen;  
 	rx_data_ptr				cmd_read_payload;
+	tx_data_ptr				cmd_transmit;	
+	actAsRx_ptr				cmd_act_as_RX;
+	fptr                    cmd_flush_rx;
+	fptr                    cmd_flush_tx;
+	
 	
 	
 	spiSend_ptr				spi_spiSend;
 	spiSednMultiByte_ptr	spi_spiSendMultiByte;
 	spiRead_ptr				spi_spiRead;
 
-}CL_nrf24l01p_init_rx_type;
+}CL_nrf24l01p_init_type;
 
 
 
@@ -250,12 +217,12 @@ typedef struct //user structure to control transmitter
 //	tx_set_addr_ptr set_addr;
 //	fptr listen; //use generic pointer for this
 //	rx_data_ptr read_payload;
-	spiSend_ptr spiSend;
-	spiSednMultiByte_ptr speSendMultiByte;
+	spiSend_ptr				spiSend;
+	spiSednMultiByte_ptr	spiSendMultiByte;
 	spiRead_ptr				spiRead;
-}CL_nrf_rx;
+}NRF_type;
 
-CL_nrf_rx nrfRX;
+NRF_type NRF;
 
 
 //------------------------------------------------------------------------
@@ -276,14 +243,16 @@ void NRF_cmd_FLUSH_TX(void);
 void NRF_cmd_FLUSH_RX(void);
 void NRF_cmd_reuse_TX_PL(void);
 void NRF_cmd_listen(void);
+void NRF_cmd_clear_interrupts(void);
 uint8_t NRF_cmd_get_status(void);
-
+void NRF_cmd_act_as_RX(bool state);
 void NRF_setup_rx(void);
 void NRF_setup_tx(void);
 void NRF_setup_config_reg(void);
 
-void NRF_init_tx(CL_nrf24l01p_init_tx_type* nrf_type);
-void NRF_init_rx(CL_nrf24l01p_init_rx_type *nrf_type);
+void NRF_init_tx(CL_nrf24l01p_init_type* nrf_type);
+void NRF_init_rx(CL_nrf24l01p_init_type *nrf_type);
+void NRF_init(CL_nrf24l01p_init_type *nrf_type);
 void NRF_set_tx_addr(uint32_t addr_high, uint8_t addr_low); 
 void NRF_set_rx_addr(uint8_t rx_pipe, uint32_t addr_high, uint8_t addr_low);
 

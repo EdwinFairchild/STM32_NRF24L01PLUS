@@ -98,7 +98,7 @@ int main(void)
 	NRF_CSN_HIGH();
 	NRF_CE_LOW();
 	
-
+	delayMS(200);
 
 
 
@@ -132,7 +132,8 @@ int main(void)
 
 	
 	
-	CL_nrf24l01p_init_rx_type myRX;
+	CL_nrf24l01p_init_type myRX;
+	
 	myRX.set_address_width = FIVE_BYTES;
 	myRX.set_crc_scheme = 0;
 	myRX.set_enable_auto_ack = true;
@@ -143,9 +144,14 @@ int main(void)
 	myRX.set_rx_addr_byte_2_5 = 0xAABBCCDD;
 	myRX.set_rf_channel = 0x7B;
 	myRX.set_payload_width = 2;	
-	myRX.spi_spiSend = &spiSend;
-	NRF_init_rx(&myRX);
 	
+	myRX.spi_spiSend = &spiSend;	
+	myRX.spi_spiRead = &spiRead;
+	myRX.spi_spiSendMultiByte = &spiSendMultiByte;
+	
+	NRF_init(&myRX);
+	
+	myRX.cmd_act_as_RX(true);
 	
 	
 	myRX.cmd_listen();
@@ -186,8 +192,7 @@ int main(void)
 				if (flag == 0x55)
 				{			
 					flag = 0x00;					
-					NRF_cmd_modify_reg(NRF_STATUS, RX_DR, 1);								
-					//NRF_cmd_read_RX_PAYLOAD(rx_data_buff, 2);
+					
 					myRX.cmd_read_payload(rx_data_buff, 2);
 					NRF_cmd_FLUSH_RX();					
 					for(int i = 0 ; i < 2 ; i++)
@@ -238,25 +243,7 @@ void printRegister(uint8_t reg)
 /* ______________________________________________________________ */
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  Hardware specific functions   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-void spiSendMultiDummy(  uint8_t *buff,uint32_t len ) 
-{
-	//when you are sending dummybytes its because youre
-	//interested in the response hence they replies are
-	//sent to a buffer
-	__IO uint8_t *spidr = ((__IO uint8_t *)&NRF_SPI->DR);
-	uint8_t  i = 0;
-	for(int i = 0 ; i < len; i++)
-	{
-		NRF_SPI->DR = DUMMYBYTE;
-	//	while (!(NRF_SPI->SR & SPI_SR_TXE)) ;
-		buff[i] = spiRead(); //does this work or is it too soon?
-		//len--;
-		//i++;
-		while (NRF_SPI->SR & SPI_SR_BSY) ;
-				
-	}
 
-}
 /* ______________________________________________________________ */
 void spiSendMultiByte(uint8_t * data_to_send, uint32_t len, uint8_t *rx_buffer)
 { 

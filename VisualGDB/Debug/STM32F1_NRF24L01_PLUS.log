@@ -1,5 +1,6 @@
 ﻿  CL_nrf24l01p.c
+  STM32F1_NRF24L01_PLUS.c
   Linking VisualGDB/Debug/STM32F1_NRF24L01_PLUS...
   ------------------- Memory utilization report -------------------
-  Used FLASH: 8832 bytes out of 64KB (13%) [+12]
-  Used SRAM: 460 bytes out of 20KB (2%)
+  Used FLASH: 9628 bytes out of 64KB (14%) [+72]
+  Used SRAM: 444 bytes out of 20KB (2%)
