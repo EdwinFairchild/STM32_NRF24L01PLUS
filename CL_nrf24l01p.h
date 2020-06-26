@@ -244,11 +244,12 @@ void NRF_cmd_FLUSH_RX(void);
 void NRF_cmd_reuse_TX_PL(void);
 void NRF_cmd_listen(void);
 void NRF_cmd_clear_interrupts(void);
-uint8_t NRF_cmd_get_status(void);
 void NRF_cmd_act_as_RX(bool state);
 void NRF_setup_rx(void);
 void NRF_setup_tx(void);
 void NRF_setup_config_reg(void);
+uint8_t NRF_cmd_get_status(void);
+
 
 void NRF_init_tx(CL_nrf24l01p_init_type* nrf_type);
 void NRF_init_rx(CL_nrf24l01p_init_type *nrf_type);

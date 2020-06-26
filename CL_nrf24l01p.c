@@ -375,7 +375,8 @@ void NRF_init(CL_nrf24l01p_init_type *nrf_type)
 	NRF.spiSendMultiByte	= *nrf_type->spi_spiSendMultiByte;
 
 	//CONFIG register
-	NRF_cmd_modify_reg(NRF_CONFIG, PWR_UP, 1);    // turn on 		
+	NRF_cmd_modify_reg(NRF_CONFIG, PWR_UP, 1);    // turn on 
+	delayMS(100);
 	NRF_cmd_modify_reg(NRF_CONFIG, CRCO, nrf_type->set_crc_scheme);      //set CRC scheme
 	NRF_cmd_modify_reg(NRF_CONFIG, EN_CRC, nrf_type->set_enable_crc);    //turn on CRC	
 	NRF_cmd_modify_reg(NRF_CONFIG, MASK_TX_DS, !(nrf_type->set_enable_tx_ds_interrupt));    //dsiable TX_DS interrupt on IRQ pin

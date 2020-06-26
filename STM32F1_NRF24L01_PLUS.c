@@ -106,22 +106,35 @@ int main(void)
 	
 #ifdef BETX
 
-	CL_nrf24l01p_init_tx_type myNRF;
-	myNRF.address_width = FIVE_BYTES;
-	myNRF.enable_auto_ack = true;
-	myNRF.crc_scheme = 0;  //1 byte
-	myNRF.enable_crc = true;
-	myNRF.tx_addr_byte_1 = 0x28;
-	myNRF.tx_addr_byte_2_5 = 0xAABBCCDD;
-	myNRF.enable_max_rt_interrupt = true;
-	myNRF.enable_tx_ds_interrupt = true;
-	myNRF.rf_channel = 0x7B;
+	CL_nrf24l01p_init_type myRX;
 	
-	NRF_init_tx(&myNRF);
-
-
-
-	nrfTX.transmit(payload, 2);
+	myRX.set_address_width = FIVE_BYTES;
+	myRX.set_crc_scheme = 0;
+	myRX.set_enable_auto_ack = true;
+	myRX.set_enable_crc = true;
+	//myRX.set_enable_rx_dr_interrupt = true;
+	//myRX.set_rx_pipe = RX_PIPE_5;
+	//myRX.set_rx_addr_byte_1 = 0x28;
+	//myRX.set_rx_addr_byte_2_5 = 0xAABBCCDD;
+	myRX.set_enable_tx_mode = true;
+	myRX.set_enable_max_rt_interrupt = true;
+	myRX.set_enable_tx_ds_interrupt = true;
+	myRX.set_tx_addr_byte_1 = 0x28;
+	myRX.set_tx_addr_byte_2_5 = 0xAABBCCDD;
+	myRX.set_rf_channel = 0x7B;
+	myRX.set_payload_width = 2;	
+	
+	myRX.spi_spiSend = &spiSend;	
+	myRX.spi_spiRead = &spiRead;
+	myRX.spi_spiSendMultiByte = &spiSendMultiByte;
+	
+	NRF_init(&myRX);
+	myRX.cmd_act_as_RX(false);
+	myRX.cmd_transmit(payload, 2);
+	
+	
+	//myRX.cmd_listen();
+	 
 	
 
 	
@@ -139,11 +152,18 @@ int main(void)
 	myRX.set_enable_auto_ack = true;
 	myRX.set_enable_crc = true;
 	myRX.set_enable_rx_dr_interrupt = true;
+	myRX.set_enable_rx_mode = true;
 	myRX.set_rx_pipe = RX_PIPE_5;
 	myRX.set_rx_addr_byte_1 = 0x28;
 	myRX.set_rx_addr_byte_2_5 = 0xAABBCCDD;
 	myRX.set_rf_channel = 0x7B;
 	myRX.set_payload_width = 2;	
+	
+	myRX.set_enable_tx_mode = true;
+	myRX.set_enable_max_rt_interrupt = true;
+	myRX.set_enable_tx_ds_interrupt = true;
+	myRX.set_tx_addr_byte_1 = 0x28;
+	myRX.set_tx_addr_byte_2_5 = 0xAABBCCDD;
 	
 	myRX.spi_spiSend = &spiSend;	
 	myRX.spi_spiRead = &spiRead;
@@ -170,19 +190,12 @@ int main(void)
 				if (flag == 0x55)
 				{			
 					flag = 0x00;	
-					//NRF_cmd_read_single_byte_reg(NRF_CONFIG);
-					printRegister(NRF_STATUS);		
-					CL_printMsg(" \n----\n");
-					NRF_cmd_modify_reg(NRF_STATUS, TX_DS, 1);   
-					NRF_cmd_modify_reg(NRF_STATUS, MAX_RT, 1);   	
-		
-					
-					delayMS(100);
-					//NRF_cmd_write_TX_PAYLOAD(payload, 19);
-					payload[0]++;
-					payload[1]--;
-					nrfTX.transmit(payload, 2);
-		
+					printRegister(NRF_STATUS);
+					myRX.cmd_clear_interrupts();						
+					payload[0]+=10;
+					payload[1]-=10;
+					myRX.cmd_transmit(payload, 2);
+					delayMS(50);
 				}
 	
 		#endif
@@ -192,7 +205,7 @@ int main(void)
 				if (flag == 0x55)
 				{			
 					flag = 0x00;					
-					
+					myRX.cmd_clear_interrupts();
 					myRX.cmd_read_payload(rx_data_buff, 2);
 					NRF_cmd_FLUSH_RX();					
 					for(int i = 0 ; i < 2 ; i++)
