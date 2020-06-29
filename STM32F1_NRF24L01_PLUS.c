@@ -50,35 +50,61 @@ just so long as you send the correct number of them.
 #include "CL_printMsg.h"
 #include  "CL_nrf24l01p.h"
 //-----------| NRF Macros / Variables |-----------
-/* 
-  [ RX:HIGH:receive packets ]
-  [ TX:HIGH:transmitt packets on low to high transt.]
-*/
+
+#define NRF_SPI			SPI1
+#define NRF_CE_PIN		LL_GPIO_PIN_2  //chip enable pin to make the transceiver transmit or listen
+#define NRF_CE_PORT		GPIOA
+#define NRF_IRQ_PIN		LL_GPIO_PIN_4 // [ interrupt pin active Low ]
+#define NRF_IRQ_PORT	GPIOA
+#define NRF_CSN_PIN		LL_GPIO_PIN_3 //Low when SPI active
+#define NRF_CSN_PORT    GPIOA
+// [ SPI : keep at or below 2Mbs ]
+
+#define NRF_CLK_PIN		LL_GPIO_PIN_5
+#define NRF_MOSI_PIN	LL_GPIO_PIN_7
+#define NRF_MISO_PIN	LL_GPIO_PIN_6
+
+#define NRF_PINS_CLOCK_ENABLE() (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN )  //given the pins are on GPIOA
+
+
+
+
+#define NRF_CE_HIGH()  ( NRF_CE_PORT->BSRR = NRF_CE_PIN	)
+#define NRF_CE_LOW()   ( NRF_CE_PORT->BRR = NRF_CE_PIN	)
+#define NRF_CSN_HIGH() ( NRF_CSN_PORT->BSRR = NRF_CSN_PIN )
+#define NRF_CSN_LOW()  ( NRF_CSN_PORT->BRR = NRF_CSN_PIN )
+
+#define NRF_START_LISTENING()  ( NRF_CE_PORT->BSRR = NRF_CE_PIN	)
+#define NRF_STOP_LISTENING()   ( NRF_CE_PORT->BRR = NRF_CE_PIN	)
+
 uint8_t NRFSTATUS = 0x00;
 uint8_t tx_data_buff[32];
 uint8_t rx_data_buff[32];
 
 uint8_t multibyte_buff[10] = { 0 };
-//uint8_t DUMMYBYTE = 0xFF;
+uint8_t flag = 0x55;
 
 
-uint8_t flag = 0x00;
-//-----------| Prototypes |-----------
+//-----------| NRF Prototypes |-----------
 void init_pins(void);
 void init_spi1(void);
 
 void spiSendMultiByte(uint8_t * data_to_send, uint32_t len, uint8_t *rx_buffer);
 void spiSend(uint8_t  data);
 uint8_t spiRead(void);
-void printRegister(uint8_t reg);
-
-
-
+void CE_pin_HIGH(void);
+void CE_pin_LOW(void);
+void CSN_pin_HIGH(void);
+void CSN_pin_LOW(void);
 
 
 //------------| Debug stuff |----------
 void init_debug_led(void);
 void blinkLed(void);
+void printRegister(uint8_t reg);
+
+
+
 //#define BETX
 #define BERX
 
@@ -87,7 +113,7 @@ void blinkLed(void);
 int main(void)
 {
 	uint8_t buff[5] = { 3, 3, 3, 3, 3 };
-	uint8_t payload[] = { 0, 255 }; //"hello";
+	uint8_t payload[32] = "Edwin";
 	setSysClockTo72();
 	CL_delay_init();
 	CL_printMsg_init_Default(false);
@@ -100,66 +126,26 @@ int main(void)
 	
 	delayMS(200);
 
-
-
 	
-	
-#ifdef BETX
-
 	CL_nrf24l01p_init_type myRX;
 	
 	myRX.set_address_width = FIVE_BYTES;
-	myRX.set_crc_scheme = 0;
+	myRX.set_crc_scheme = ENCODING_SCHEME_1_BYTE;
 	myRX.set_enable_auto_ack = true;
 	myRX.set_enable_crc = true;
-	//myRX.set_enable_rx_dr_interrupt = true;
-	//myRX.set_rx_pipe = RX_PIPE_5;
-	//myRX.set_rx_addr_byte_1 = 0x28;
-	//myRX.set_rx_addr_byte_2_5 = 0xAABBCCDD;
-	myRX.set_enable_tx_mode = true;
-	myRX.set_enable_max_rt_interrupt = true;
-	myRX.set_enable_tx_ds_interrupt = true;
-	myRX.set_tx_addr_byte_1 = 0x28;
-	myRX.set_tx_addr_byte_2_5 = 0xAABBCCDD;
 	myRX.set_rf_channel = 0x7B;
-	myRX.set_payload_width = 2;	
-	
-	myRX.spi_spiSend = &spiSend;	
-	myRX.spi_spiRead = &spiRead;
-	myRX.spi_spiSendMultiByte = &spiSendMultiByte;
-	
-	NRF_init(&myRX);
-	myRX.cmd_act_as_RX(false);
-	myRX.cmd_transmit(payload, 2);
+	myRX.set_enable_dynamic_pl_width = true;	
 	
 	
-	//myRX.cmd_listen();
-	 
 	
-
-	
-#endif
-	
-#ifdef BERX
-	//NRF_setup_rx();
-
-	
-	
-	CL_nrf24l01p_init_type myRX;
-	
-	myRX.set_address_width = FIVE_BYTES;
-	myRX.set_crc_scheme = 0;
-	myRX.set_enable_auto_ack = true;
-	myRX.set_enable_crc = true;
 	myRX.set_enable_rx_dr_interrupt = true;
-	myRX.set_enable_rx_mode = true;
-	myRX.set_rx_pipe = RX_PIPE_5;
+	myRX.set_enable_rx_mode = true; //---------------
+	myRX.set_rx_pipe = PIPE_5;
 	myRX.set_rx_addr_byte_1 = 0x28;
 	myRX.set_rx_addr_byte_2_5 = 0xAABBCCDD;
-	myRX.set_rf_channel = 0x7B;
 	myRX.set_payload_width = 2;	
 	
-	myRX.set_enable_tx_mode = true;
+	myRX.set_enable_tx_mode = true ; //-------------
 	myRX.set_enable_max_rt_interrupt = true;
 	myRX.set_enable_tx_ds_interrupt = true;
 	myRX.set_tx_addr_byte_1 = 0x28;
@@ -169,18 +155,23 @@ int main(void)
 	myRX.spi_spiRead = &spiRead;
 	myRX.spi_spiSendMultiByte = &spiSendMultiByte;
 	
+	myRX.pin_CE_HIGH = &CE_pin_HIGH;
+	myRX.pin_CE_LOW  = &CE_pin_LOW;
+	myRX.pin_CSN_HIGH = &CSN_pin_HIGH;
+	myRX.pin_CSN_LOW = &CSN_pin_LOW;
+	
+	
+	
 	NRF_init(&myRX);
 	
-	myRX.cmd_act_as_RX(true);
+	myRX.cmd_act_as_RX(true); //-----------
 	
 	
+	//myRX.cmd_transmit(payload,strlen(payload));
 	myRX.cmd_listen();
-	 
-	
-
-#endif
 
 
+	uint8_t counter = 0x00;
 	 
 	
 	for (;;)
@@ -190,12 +181,13 @@ int main(void)
 				if (flag == 0x55)
 				{			
 					flag = 0x00;	
-					printRegister(NRF_STATUS);
+					//printRegister(NRF_STATUS);
 					myRX.cmd_clear_interrupts();						
-					payload[0]+=10;
-					payload[1]-=10;
-					myRX.cmd_transmit(payload, 2);
-					delayMS(50);
+					sprintf(payload, "Edwin %d", counter++);
+					
+					myRX.cmd_transmit(payload, strlen(payload));
+				
+					delayMS(200);
 				}
 	
 		#endif
@@ -203,17 +195,28 @@ int main(void)
 		#ifdef BERX
 		
 				if (flag == 0x55)
-				{			
+				{		
+					CL_printMsg("interrupted\n");
 					flag = 0x00;					
 					myRX.cmd_clear_interrupts();
-					myRX.cmd_read_payload(rx_data_buff, 2);
-					NRF_cmd_FLUSH_RX();					
-					for(int i = 0 ; i < 2 ; i++)
+					uint8_t len = NRF_cmd_read_dynamic_pl_width();
+					
+					
+					if (len < 33)
 					{
-						CL_printMsg(" %d ", rx_data_buff[i]);
-						rx_data_buff[i] = 0;
+						
+				
+						CL_printMsg("len : %d \n", len);
+						myRX.cmd_read_payload(rx_data_buff, len);
+						NRF_cmd_FLUSH_RX();					
+						for (int i = 0; i < len; i++)
+						{
+							CL_printMsg(" %c ", rx_data_buff[i]);
+							rx_data_buff[i] = 0;
+						}
+						CL_printMsg("\n-\n");
+						
 					}
-					CL_printMsg("\n-\n");
 					myRX.cmd_listen();					
 				}
 		#endif
@@ -258,26 +261,10 @@ void printRegister(uint8_t reg)
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  Hardware specific functions   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 /* ______________________________________________________________ */
-void spiSendMultiByte(uint8_t * data_to_send, uint32_t len, uint8_t *rx_buffer)
-{ 
-	//consider what to do with returned bytes usually when 
-	//sending data returned bytes are not needed 
-	__IO uint8_t *spidr = ((__IO uint8_t *)&NRF_SPI->DR);
 
-	for(uint8_t i = 0 ; i < len ; i++)
-	{		
-		
-		NRF_SPI->DR = *data_to_send++;
-	   //if you mcu is really fast you might want to the the chekc busy flag code here	
-		rx_buffer[i] = spiRead();
-		
-
-		while (NRF_SPI->SR & SPI_SR_BSY) ;	//this is the check busy flag code
-	
-		
-	}
-}
 /* ______________________________________________________________ */
+
+
 void spiSend(uint8_t  data)
 {	
 	__IO uint8_t *spidr = ((__IO uint8_t *)&NRF_SPI->DR);
@@ -286,12 +273,50 @@ void spiSend(uint8_t  data)
 	while (NRF_SPI->SR & LL_SPI_SR_BSY) ;
 	
 }
-/* ______________________________________________________________ */
+
+
+void spiSendMultiByte(uint8_t * data_to_send, uint32_t len, uint8_t *rx_buffer)
+{ 
+	//consider what to do with returned bytes usually when 
+	//sending data returned bytes are not needed 
+	__IO uint8_t *spidr = ((__IO uint8_t *)&NRF_SPI->DR);
+
+	for(uint8_t i = 0 ; i < len ; i++)
+	{				
+		NRF_SPI->DR = *data_to_send++;
+	   //if you mcu is really fast you might want to the the chekc busy flag code here	
+		rx_buffer[i] = spiRead();
+		while (NRF_SPI->SR & SPI_SR_BSY) ;	//this is the check busy flag code		
+	}
+}
+
 uint8_t spiRead(void)
 {	
-	return (uint8_t)(NRF_SPI->DR);
-	
+	return (uint8_t)(NRF_SPI->DR);	
 }
+
+
+
+void CE_pin_HIGH(void)
+{
+	GPIOA->BSRR = LL_GPIO_PIN_2;
+}
+void CE_pin_LOW(void)
+{
+	GPIOA->BRR = LL_GPIO_PIN_2;
+}
+void CSN_pin_HIGH(void)
+{
+	GPIOA->BSRR = LL_GPIO_PIN_3;
+}
+
+void CSN_pin_LOW(void)
+{
+	GPIOA->BRR = LL_GPIO_PIN_3;
+}
+
+
+
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -299,10 +324,12 @@ uint8_t spiRead(void)
 
 
 /* ______________________________________________________________ */
+
+
 void init_pins(void)
 {
-	//clocks
-	NRF_PINS_CLOCK_ENABLE();
+	//clock enable GPIOA
+	RCC->APB2ENR |= RCC_APB2ENR_IOPAEN;
 	
 	LL_GPIO_InitTypeDef nrfPins;	
 	LL_GPIO_StructInit(&nrfPins);	
@@ -320,7 +347,7 @@ void init_pins(void)
 	// IRQ pin as input with interrupt enabled
 	nrfPins.Pin			= NRF_IRQ_PIN;
 	nrfPins.Mode = LL_GPIO_MODE_INPUT;
-	//nrfPins.Pull = LL_GPIO_PULL_UP;
+	nrfPins.Pull = LL_GPIO_PULL_UP;
 	LL_GPIO_Init(NRF_IRQ_PORT, &nrfPins);
 		
 	LL_EXTI_InitTypeDef myEXTI = { 0 };
@@ -331,11 +358,13 @@ void init_pins(void)
 	myEXTI.Trigger			= LL_EXTI_TRIGGER_FALLING;
 	LL_EXTI_Init(&myEXTI);	
 
-	NVIC_EnableIRQ(EXTI4_IRQn);
-	
-	
+	NVIC_EnableIRQ(EXTI4_IRQn);	
 }
+
+
 /* ______________________________________________________________ */
+
+
 void init_spi1(void)
 {
 	// CLOCK  [ Alt Function ] [ GPIOA ] [ SPI1 ]
@@ -371,6 +400,9 @@ void init_spi1(void)
 	LL_SPI_Enable(NRF_SPI);	
 	
 }
+
+
+
 /* ______________________________________________________________ */
 void EXTI4_IRQHandler(void)
 {
@@ -379,9 +411,9 @@ void EXTI4_IRQHandler(void)
 	
 		NRF_STOP_LISTENING();    //CE LOW
 #endif
-	
-	GPIOC->ODR ^= 1 << 13;
 	flag = 0x55;
+	GPIOC->ODR ^= 1 << 13;
+
 	
 }
 /* ______________________________________________________________ */
