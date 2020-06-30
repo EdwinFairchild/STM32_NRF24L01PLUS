@@ -238,21 +238,21 @@ NRF_type NRF;
 	void NRF_cmd_write_entire_reg(uint8_t reg, uint8_t value); 
 
 	uint8_t NRF_cmd_get_pipe_current_pl(void);
-uint8_t  NRF_cmd_read_dynamic_pl_width(void);
+	uint8_t  NRF_cmd_read_dynamic_pl_width(void);
 	uint8_t NRF_cmd_get_status(void);
-void NRF_cmd_write_TX_ADDR(uint8_t *addr, uint8_t len); 
+ 
 void NRF_cmd_read_RX_PAYLOAD(uint8_t *data, uint8_t len);
 void NRF_cmd_write_TX_PAYLOAD(uint8_t *data, uint8_t len);
-void NRF_cmd_setup_addr_width(uint8_t width);
+	void NRF_cmd_setup_addr_width(uint8_t width); //
 	void NRF_cmd_FLUSH_TX(void);
 	void NRF_cmd_FLUSH_RX(void);
 void NRF_cmd_reuse_TX_PL(void);
-void NRF_cmd_activate(void);
+	void NRF_cmd_activate(void);
 	void NRF_cmd_listen(void);
 	void NRF_cmd_clear_interrupts(void);
 	void NRF_cmd_act_as_RX(bool state);
 
-void NRF_set_tx_addr(uint32_t addr_high, uint8_t addr_low , bool auto_ack); 
+	void NRF_set_tx_addr(uint32_t addr_high, uint8_t addr_low , bool auto_ack); 
 void NRF_set_rx_addr(uint8_t rx_pipe, uint32_t addr_high, uint8_t addr_low);
 void NRF_init(CL_nrf24l01p_init_type *nrf_type);
 

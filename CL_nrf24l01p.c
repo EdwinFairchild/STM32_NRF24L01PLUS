@@ -55,29 +55,10 @@ uint8_t  NRF_cmd_read_single_byte_reg(uint8_t reg)
 }
 uint8_t  NRF_cmd_read_dynamic_pl_width(void)
 {
-	NRF.NRF_CSN_LOW();
-	
-	NRF.spiSend(R_RX_PL_WID );       // send register name
-	NRFSTATUS = NRF.spiRead();
-	NRF.spiSend(DUMMYBYTE);
-   
-	NRF.NRF_CSN_HIGH();
-	return NRF.spiRead();
+	return NRF_cmd_read_single_byte_reg(R_RX_PL_WID) ;
 }
 /* ______________________________________________________________ */
-void NRF_cmd_write_TX_ADDR(uint8_t *addr, uint8_t len)//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@ NOT used
-{
-	
-	
-	NRF.NRF_CSN_LOW();
-	
-	NRF.spiSend(TX_ADDR | W_REGISTER);     //read data register
-	NRFSTATUS = NRF.spiRead();
-	NRF.spiSendMultiByte(addr, len, rx_buff);    //faster than for loop with individual NRF.spiSend
-	 
-	NRF.NRF_CSN_HIGH();
-	
-}
+
 /* ______________________________________________________________ */
 void NRF_cmd_write_reg(uint8_t reg, uint8_t value)
 {
@@ -156,18 +137,7 @@ void NRF_cmd_write_5byte_reg(uint8_t reg, uint8_t value)
 	NRF.NRF_CSN_HIGH();
 }
 /* ______________________________________________________________ */
-void NRF_cmd_setup_addr_width(uint8_t width) 
-{
-	NRF.NRF_CSN_LOW();	
-	
-	NRF.spiSend(SETUP_AW | W_REGISTER);        //write data register
-	NRFSTATUS = NRF.spiRead();
-	
-	NRF.spiSend(width & 0x03); 
-	NRFSTATUS = NRF.spiRead();
 
-	NRF.NRF_CSN_HIGH();
-}
 void NRF_cmd_read_RX_PAYLOAD(uint8_t *rx_buffer, uint8_t len)
 {
 	NRF.NRF_CE_LOW();
@@ -218,8 +188,7 @@ void NRF_cmd_activate(void)
 	NRF.spiSend(ACTIVATE);    
 	NRFSTATUS = NRF.spiRead();	
 	NRF.spiSend(ACTIVATE_BYTE);    
-	NRFSTATUS = NRF.spiRead();
-	
+	NRFSTATUS = NRF.spiRead();	
 	
 	NRF.NRF_CSN_HIGH();
 }
@@ -331,16 +300,22 @@ void NRF_init(CL_nrf24l01p_init_type *nrf_type)
 
 
 }
-void NRF_set_tx_addr(uint32_t addr_high, uint8_t addr_low, bool auto_ack) //  pipe 0 allso must match this for auto ack
-{
-			
-	
-	NRF.NRF_CSN_LOW();
+void NRF_set_tx_addr(uint32_t addr_high, uint8_t addr_low, bool auto_ack)
+{	
+	NRF.NRF_CSN_LOW(); //start SPI comms by a LOW on CSN
 
-	NRF.spiSend(TX_ADDR | W_REGISTER);           //write data register
+	NRF.spiSend(TX_ADDR | W_REGISTER); //send write command to ADDR
 	NRFSTATUS = NRF.spiRead();
 
-	NRF.spiSend(addr_low);
+	/*  5 byte address is devided into a uint8_t low byte
+	 *  and a uint32_t high byte
+	 *  since the SPI can only send 1 byte at a time
+	 *  we first send the low byte
+	 *  and then extract the other bytes from the uint32 
+	 *  and send them one by one LSB first
+	 */
+	
+	NRF.spiSend(addr_low); 
 	NRFSTATUS = NRF.spiRead();
 	NRF.spiSend(addr_high & 0xFF);
 	NRFSTATUS = NRF.spiRead();
@@ -351,15 +326,19 @@ void NRF_set_tx_addr(uint32_t addr_high, uint8_t addr_low, bool auto_ack) //  pi
 	NRF.spiSend((addr_high >> 24) & 0xFF);
 	NRFSTATUS = NRF.spiRead();
 	NRF.NRF_CSN_HIGH();
-
+	
+	/* If auto ack is enabled then the same address that was written 
+	 * to TX_ADDR above must also be written to PIPE 0 because that
+	 * is the pipe that it will receive the auto ack on. This cannot
+	 * be changed it is hardwaired to receive acks on pipe 0 */
 	
 	if (auto_ack)
 	{	
 		NRF_cmd_modify_reg(EN_AA, ENAA_P0, 1);        //enable auto ack on pipe 0	
 		NRF.NRF_CSN_LOW();
 
-		//pipe 0 must have same address as TX_ADDR in order of auto ack to work
-		NRF.spiSend(RX_ADDR_P0 | W_REGISTER);             //write tx address to pipe 0 register
+		//write address into pipe 0
+		NRF.spiSend(RX_ADDR_P0 | W_REGISTER);             
 		NRFSTATUS = NRF.spiRead();
 
 		NRF.spiSend(addr_low);
@@ -370,14 +349,11 @@ void NRF_set_tx_addr(uint32_t addr_high, uint8_t addr_low, bool auto_ack) //  pi
 
 		NRFSTATUS = NRF.spiRead();
 
-
-
-		NRF.NRF_CSN_HIGH();
-	}
-	
+		NRF.NRF_CSN_HIGH(); //end spi
+	}	
 }
 
-void NRF_set_rx_addr(uint8_t rx_pipe, uint32_t addr_high, uint8_t addr_low) //  pipe 0 allso must match this for auto ack
+void NRF_set_rx_addr(uint8_t rx_pipe, uint32_t addr_high, uint8_t addr_low) 
 {
 	uint8_t temp;
 	
@@ -413,6 +389,7 @@ void NRF_set_rx_addr(uint8_t rx_pipe, uint32_t addr_high, uint8_t addr_low) //  
 			temp = NRF.spiRead();
 			NRF.NRF_CSN_HIGH();
 		}
+	
 	else
 	{
 		//this is for pipe 1 or 0 
