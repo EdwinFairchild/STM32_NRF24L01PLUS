@@ -49,6 +49,8 @@ just so long as you send the correct number of them.
 #include "CL_systemClockUpdate.h"
 #include "CL_printMsg.h"
 #include  "CL_nrf24l01p.h"
+
+
 //-----------| NRF Macros / Variables |-----------
 
 #define NRF_SPI			SPI1
@@ -69,13 +71,8 @@ just so long as you send the correct number of them.
 
 
 
-#define NRF_CE_HIGH()  ( NRF_CE_PORT->BSRR = NRF_CE_PIN	)
-#define NRF_CE_LOW()   ( NRF_CE_PORT->BRR = NRF_CE_PIN	)
-#define NRF_CSN_HIGH() ( NRF_CSN_PORT->BSRR = NRF_CSN_PIN )
-#define NRF_CSN_LOW()  ( NRF_CSN_PORT->BRR = NRF_CSN_PIN )
 
-#define NRF_START_LISTENING()  ( NRF_CE_PORT->BSRR = NRF_CE_PIN	)
-#define NRF_STOP_LISTENING()   ( NRF_CE_PORT->BRR = NRF_CE_PIN	)
+
 
 uint8_t NRFSTATUS = 0x00;
 uint8_t tx_data_buff[32];
@@ -112,45 +109,47 @@ void printRegister(uint8_t reg);
 /* ______________________________________________________________ */
 int main(void)
 {
-	uint8_t buff[5] = { 3, 3, 3, 3, 3 };
-	uint8_t payload[32] = "Edwin";
+
+	//------ NON related code --------------
 	setSysClockTo72();
 	CL_delay_init();
 	CL_printMsg_init_Default(false);
 	init_debug_led();
+	//-------------------------------------
 	
+	
+	
+	uint8_t payload[32] = "Edwin";
 	init_pins();
-	init_spi1();
-	NRF_CSN_HIGH();
-	NRF_CE_LOW();
+	init_spi1();	
+	delayMS(200); //give it a second to power up / stabalize etc.....
 	
-	delayMS(200);
-
+	CL_nrf24l01p_init_type myRX; // make an instance of the driver
 	
-	CL_nrf24l01p_init_type myRX;
-	
+	//common stuff
 	myRX.set_address_width = FIVE_BYTES;
 	myRX.set_crc_scheme = ENCODING_SCHEME_1_BYTE;
 	myRX.set_enable_auto_ack = true;
 	myRX.set_enable_crc = true;
 	myRX.set_rf_channel = 0x7B;
-	myRX.set_enable_dynamic_pl_width = true;	
+	myRX.set_enable_dynamic_pl_width = true;		
 	
-	
-	
+	//rx stuff
 	myRX.set_enable_rx_dr_interrupt = true;
-	myRX.set_enable_rx_mode = true; //---------------
+	myRX.set_enable_rx_mode = true; 
 	myRX.set_rx_pipe = PIPE_5;
 	myRX.set_rx_addr_byte_1 = 0x28;
 	myRX.set_rx_addr_byte_2_5 = 0xAABBCCDD;
 	myRX.set_payload_width = 2;	
 	
-	myRX.set_enable_tx_mode = true ; //-------------
+	//tx stuff
+	myRX.set_enable_tx_mode = true ; 
 	myRX.set_enable_max_rt_interrupt = true;
 	myRX.set_enable_tx_ds_interrupt = true;
 	myRX.set_tx_addr_byte_1 = 0x28;
 	myRX.set_tx_addr_byte_2_5 = 0xAABBCCDD;
 	
+	//hardware specific functions
 	myRX.spi_spiSend = &spiSend;	
 	myRX.spi_spiRead = &spiRead;
 	myRX.spi_spiSendMultiByte = &spiSendMultiByte;
@@ -158,20 +157,25 @@ int main(void)
 	myRX.pin_CE_HIGH = &CE_pin_HIGH;
 	myRX.pin_CE_LOW  = &CE_pin_LOW;
 	myRX.pin_CSN_HIGH = &CSN_pin_HIGH;
-	myRX.pin_CSN_LOW = &CSN_pin_LOW;
+	myRX.pin_CSN_LOW = &CSN_pin_LOW;	
 	
+	NRF_init(&myRX); // initialize
 	
-	
-	NRF_init(&myRX);
-	
-	myRX.cmd_act_as_RX(true); //-----------
-	
-	
-	//myRX.cmd_transmit(payload,strlen(payload));
+#ifdef BERX
+	// act as rx and start listening
+	myRX.cmd_act_as_RX(true);
 	myRX.cmd_listen();
-
-
+	
+#endif 
+	
+#ifdef BETX
+	//act as TX and send data
+	myRX.cmd_act_as_RX(false);	
+	myRX.cmd_transmit(payload, strlen(payload));
 	uint8_t counter = 0x00;
+#endif
+
+	
 	 
 	
 	for (;;)
@@ -194,29 +198,31 @@ int main(void)
 
 		#ifdef BERX
 		
-				if (flag == 0x55)
+				if (flag == 0x55) // flag will be changed to 0x55 in interrupt, meaning we have data to read
 				{		
-					CL_printMsg("interrupted\n");
-					flag = 0x00;					
+					flag = 0x00; //reset flag					
 					myRX.cmd_clear_interrupts();
-					uint8_t len = NRF_cmd_read_dynamic_pl_width();
+					uint8_t len = myRX.cmd_get_payload_width();
 					
-					
+					 // payload width is 32bytes max, if its longer ignore becasue
+					 // it is corrupt data , so just  flush rx
 					if (len < 33)
-					{
-						
-				
-						CL_printMsg("len : %d \n", len);
-						myRX.cmd_read_payload(rx_data_buff, len);
-						NRF_cmd_FLUSH_RX();					
-						for (int i = 0; i < len; i++)
-						{
-							CL_printMsg(" %c ", rx_data_buff[i]);
-							rx_data_buff[i] = 0;
+						{		
+							//loop through payload and print to UART
+							myRX.cmd_read_payload(rx_data_buff, len);
+							NRF_cmd_FLUSH_RX();					
+							for (int i = 0; i < len; i++)
+							{
+								CL_printMsg(" %c ", rx_data_buff[i]);
+								rx_data_buff[i] = 0;
+							}
+							CL_printMsg("\n-\n");						
 						}
-						CL_printMsg("\n-\n");
-						
+					else
+					{
+						myRX.cmd_flush_rx();
 					}
+					
 					myRX.cmd_listen();					
 				}
 		#endif
@@ -256,13 +262,6 @@ void printRegister(uint8_t reg)
 		break;
 	}
 }
-/* ______________________________________________________________ */
-
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@  Hardware specific functions   @@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-/* ______________________________________________________________ */
-
-/* ______________________________________________________________ */
 
 
 void spiSend(uint8_t  data)
@@ -317,15 +316,6 @@ void CSN_pin_LOW(void)
 
 
 
-
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-/* ______________________________________________________________ */
-
-
-/* ______________________________________________________________ */
-
-
 void init_pins(void)
 {
 	//clock enable GPIOA
@@ -341,8 +331,7 @@ void init_pins(void)
 	nrfPins.OutputType	= LL_GPIO_OUTPUT_PUSHPULL;	
 	nrfPins.Speed		= LL_GPIO_SPEED_FREQ_HIGH;
 	LL_GPIO_Init(NRF_CE_PORT, &nrfPins); // CE & CSN on same port only need this once
-	NRF_CE_LOW();
-	NRF_CSN_HIGH();
+
 	
 	// IRQ pin as input with interrupt enabled
 	nrfPins.Pin			= NRF_IRQ_PIN;
@@ -357,13 +346,11 @@ void init_pins(void)
 	myEXTI.Mode				= LL_EXTI_MODE_IT;
 	myEXTI.Trigger			= LL_EXTI_TRIGGER_FALLING;
 	LL_EXTI_Init(&myEXTI);	
-
-	NVIC_EnableIRQ(EXTI4_IRQn);	
+	
+	LL_GPIO_SetOutputPin(GPIOA, NRF_CSN_PIN);
+	LL_GPIO_ResetOutputPin(GPIOA, NRF_CE_PIN);
+	NVIC_EnableIRQ(EXTI4_IRQn);	//enable IRQ on Pin 4
 }
-
-
-/* ______________________________________________________________ */
-
 
 void init_spi1(void)
 {
@@ -396,7 +383,6 @@ void init_spi1(void)
 
 	LL_SPI_Init(NRF_SPI, &mySPI);
 	
-	
 	LL_SPI_Enable(NRF_SPI);	
 	
 }
@@ -407,14 +393,9 @@ void init_spi1(void)
 void EXTI4_IRQHandler(void)
 {
 	EXTI->PR = EXTI_PR_PIF4; //clear pending interrupt
-#ifdef BERX
-	
-		NRF_STOP_LISTENING();    //CE LOW
-#endif
-	flag = 0x55;
-	GPIOC->ODR ^= 1 << 13;
 
-	
+	flag = 0x55;
+	GPIOC->ODR ^= 1 << 13;	
 }
 /* ______________________________________________________________ */
 void init_debug_led(void)

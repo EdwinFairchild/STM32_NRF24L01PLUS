@@ -141,18 +141,18 @@ void NRF_cmd_write_5byte_reg(uint8_t reg, uint8_t value)
 void NRF_cmd_read_RX_PAYLOAD(uint8_t *rx_buffer, uint8_t len)
 {
 	NRF.NRF_CE_LOW();
-	//NRF.NRF_CE_LOW(); //disable receiver mode
+	
 	NRF.NRF_CSN_LOW();
 	
 	NRF.spiSend(R_RX_PAYLOAD);
 	NRFSTATUS = NRF.spiRead();
 	
 	//for some reason i get an empty byte at the beggning of rx payload so ill just read it here
-	//so its not included in my "len"
+	//so it doesnt use up a spot in my "len" count
 	NRF.spiSend(DUMMYBYTE);
 	NRFSTATUS = NRF.spiRead();
-	//----laptop-------
-	NRF.spiSendMultiByte(dummy_array, len, rx_buffer);    //check if this works or if im reading SPI DR too soon after witing to it
+
+	NRF.spiSendMultiByte(dummy_array, len, rx_buffer);    
 	
 	NRF.NRF_CSN_HIGH();	
 }
@@ -171,7 +171,7 @@ void NRF_cmd_write_TX_PAYLOAD(uint8_t *data, uint8_t len)
 	//CE set high to start transmition if in TX mode
 	// must be held high for a bit then back low
 	NRF.NRF_CE_HIGH();
-	delayUS(50);
+	//delayUS(50);
 	NRF.NRF_CE_LOW();
 }
 
@@ -201,9 +201,7 @@ void NRF_cmd_activate(void)
 
 
 void NRF_init(CL_nrf24l01p_init_type *nrf_type)
-{
-	
-	
+{	
 	//initialize NRF command functions
 	nrf_type->cmd_clear_interrupts	= &NRF_cmd_clear_interrupts;
 	nrf_type->cmd_get_status		= &NRF_cmd_get_status;
@@ -223,14 +221,14 @@ void NRF_init(CL_nrf24l01p_init_type *nrf_type)
 	NRF.NRF_CE_HIGH			= *nrf_type->pin_CE_HIGH;
 	NRF.NRF_CE_LOW			= *nrf_type->pin_CE_LOW;
 	NRF.NRF_CSN_HIGH		= *nrf_type->pin_CSN_HIGH;
-	NRF.NRF_CSN_LOW			= *nrf_type->pin_CSN_LOW;
+	NRF.NRF_CSN_LOW			= *nrf_type->pin_CSN_LOW;	
 	
 	
-	NRF.NRF_CE_LOW(); 
-	//CONFIG register
-		//NRF_cmd_activate();
+	NRF.NRF_CE_LOW();  //start SPI comms
+	
+	//common configurations	
 	NRF_cmd_modify_reg(NRF_CONFIG, PWR_UP, 1);    // turn on 
-	delayMS(100);
+	//delayMS(100);
 	NRF_cmd_modify_reg(NRF_CONFIG, CRCO, nrf_type->set_crc_scheme);      //set CRC scheme
 	NRF_cmd_modify_reg(NRF_CONFIG, EN_CRC, nrf_type->set_enable_crc);    //turn on CRC	
 	NRF_cmd_modify_reg(NRF_CONFIG, MASK_TX_DS, !(nrf_type->set_enable_tx_ds_interrupt));    //dsiable TX_DS interrupt on IRQ pin
@@ -239,19 +237,14 @@ void NRF_init(CL_nrf24l01p_init_type *nrf_type)
 	NRF_cmd_write_entire_reg(RF_CH, nrf_type->set_rf_channel);  	//rf channel		
 	NRF_cmd_write_entire_reg(EN_AA, 0x00);     //disable auto ack by derfault, might be enabled below if user wants
 	NRF_cmd_write_entire_reg(NRF_STATUS, 0x70);      //clear any interrupts
-    NRF_cmd_write_entire_reg(SETUP_AW, nrf_type->set_address_width);    //address width	
-  
-	
-	
+    NRF_cmd_write_entire_reg(SETUP_AW, nrf_type->set_address_width);    //address width		
 	
 
 	// SET UP AS RECEIVER
 	if (nrf_type->set_enable_rx_mode)
-	{
-		
+	{		
 		NRF_cmd_modify_reg(EN_RXADDR, nrf_type->set_rx_pipe, 1);    //enable rx pipe 
-		NRF_set_rx_addr(nrf_type->set_rx_pipe, nrf_type->set_rx_addr_byte_2_5, nrf_type->set_rx_addr_byte_1);	
-		
+		NRF_set_rx_addr(nrf_type->set_rx_pipe, nrf_type->set_rx_addr_byte_2_5, nrf_type->set_rx_addr_byte_1);			
 		
 		if (nrf_type->set_enable_dynamic_pl_width)
 		{
@@ -273,15 +266,11 @@ void NRF_init(CL_nrf24l01p_init_type *nrf_type)
 				NRF_cmd_modify_reg(EN_AA, ENAA_P1, 1);       //enable auto ack on pipe 1	
 				NRF_cmd_modify_reg(EN_AA, nrf_type->set_rx_pipe, 1);     //enable auto ack on pipe 5	
 			}
-		}
-		
-			
-	
+		}	
 	}
 	// SET UP AS TRANSMITTER
 	if(nrf_type->set_enable_tx_mode)
 	{		
-	
 		NRF_cmd_write_entire_reg(SETUP_RETR, 0x2F);	
 		
 		NRF_set_tx_addr(nrf_type->set_tx_addr_byte_2_5, nrf_type->set_tx_addr_byte_1, nrf_type->set_enable_auto_ack);
@@ -290,15 +279,9 @@ void NRF_init(CL_nrf24l01p_init_type *nrf_type)
 		{
 			NRF_cmd_activate();
 			NRF_cmd_modify_reg(FEATURE, EN_DPL, 1);    //enable dynamic PL feature
-			NRF_cmd_modify_reg(DYNPD, PIPE_0, 1);
-		
-		}
-
-		
-		
+			NRF_cmd_modify_reg(DYNPD, PIPE_0, 1);		
+		}			
 	}
-
-
 }
 void NRF_set_tx_addr(uint32_t addr_high, uint8_t addr_low, bool auto_ack)
 {	
