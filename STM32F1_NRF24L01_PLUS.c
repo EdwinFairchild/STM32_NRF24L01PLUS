@@ -68,12 +68,6 @@ just so long as you send the correct number of them.
 
 #define NRF_PINS_CLOCK_ENABLE() (RCC->APB2ENR |= RCC_APB2ENR_IOPAEN )  //given the pins are on GPIOA
 
-
-
-
-
-
-
 uint8_t NRFSTATUS = 0x00;
 uint8_t tx_data_buff[32];
 uint8_t rx_data_buff[32];
@@ -298,20 +292,20 @@ uint8_t spiRead(void)
 
 void CE_pin_HIGH(void)
 {
-	GPIOA->BSRR = LL_GPIO_PIN_2;
+	NRF_CE_PORT->BSRR = NRF_CE_PIN;
 }
 void CE_pin_LOW(void)
 {
-	GPIOA->BRR = LL_GPIO_PIN_2;
+	NRF_CE_PORT->BRR = NRF_CE_PIN;
 }
 void CSN_pin_HIGH(void)
 {
-	GPIOA->BSRR = LL_GPIO_PIN_3;
+	NRF_CSN_PORT->BSRR = NRF_CSN_PIN;
 }
 
 void CSN_pin_LOW(void)
 {
-	GPIOA->BRR = LL_GPIO_PIN_3;
+	NRF_CSN_PORT->BRR = NRF_CSN_PIN;
 }
 
 

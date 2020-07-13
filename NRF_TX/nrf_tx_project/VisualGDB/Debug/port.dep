@@ -1,0 +1,50 @@
+VisualGDB/Debug/port.o: FreeRTOS/Source/portable/GCC/ARM_CM3/port.c \
+ FreeRTOS/Source/include/FreeRTOS.h \
+ c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stddef.h \
+ c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdint.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\stdint.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_default_types.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\features.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\_newlib_version.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_intsup.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_stdint.h \
+ FreeRTOS/Source/include/FreeRTOSConfig.h \
+ FreeRTOS/Source/include/projdefs.h FreeRTOS/Source/include/portable.h \
+ FreeRTOS/Source/include/deprecated_definitions.h \
+ FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h \
+ FreeRTOS/Source/include/mpu_wrappers.h FreeRTOS/Source/include/task.h \
+ FreeRTOS/Source/include/list.h
+
+FreeRTOS/Source/include/FreeRTOS.h:
+
+c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stddef.h:
+
+c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdint.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\stdint.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_default_types.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\features.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\_newlib_version.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_intsup.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_stdint.h:
+
+FreeRTOS/Source/include/FreeRTOSConfig.h:
+
+FreeRTOS/Source/include/projdefs.h:
+
+FreeRTOS/Source/include/portable.h:
+
+FreeRTOS/Source/include/deprecated_definitions.h:
+
+FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h:
+
+FreeRTOS/Source/include/mpu_wrappers.h:
+
+FreeRTOS/Source/include/task.h:
+
+FreeRTOS/Source/include/list.h:

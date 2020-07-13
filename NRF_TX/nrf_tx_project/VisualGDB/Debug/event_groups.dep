@@ -1,0 +1,99 @@
+VisualGDB/Debug/event_groups.o: FreeRTOS/Source/event_groups.c \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\stdlib.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\ieeefp.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\_ansi.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\newlib.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\_newlib_version.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\config.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\features.h \
+ c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stddef.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\reent.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\_ansi.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_types.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_types.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_default_types.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\lock.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\cdefs.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\stdlib.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\alloca.h \
+ FreeRTOS/Source/include/FreeRTOS.h \
+ c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdint.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\stdint.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_intsup.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_stdint.h \
+ FreeRTOS/Source/include/FreeRTOSConfig.h \
+ FreeRTOS/Source/include/projdefs.h FreeRTOS/Source/include/portable.h \
+ FreeRTOS/Source/include/deprecated_definitions.h \
+ FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h \
+ FreeRTOS/Source/include/mpu_wrappers.h FreeRTOS/Source/include/task.h \
+ FreeRTOS/Source/include/list.h FreeRTOS/Source/include/timers.h \
+ FreeRTOS/Source/include/task.h FreeRTOS/Source/include/event_groups.h \
+ FreeRTOS/Source/include/timers.h
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\stdlib.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\ieeefp.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\_ansi.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\newlib.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\_newlib_version.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\config.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\features.h:
+
+c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stddef.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\reent.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\_ansi.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_types.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_types.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_default_types.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\lock.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\cdefs.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\stdlib.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\alloca.h:
+
+FreeRTOS/Source/include/FreeRTOS.h:
+
+c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdint.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\stdint.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_intsup.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_stdint.h:
+
+FreeRTOS/Source/include/FreeRTOSConfig.h:
+
+FreeRTOS/Source/include/projdefs.h:
+
+FreeRTOS/Source/include/portable.h:
+
+FreeRTOS/Source/include/deprecated_definitions.h:
+
+FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h:
+
+FreeRTOS/Source/include/mpu_wrappers.h:
+
+FreeRTOS/Source/include/task.h:
+
+FreeRTOS/Source/include/list.h:
+
+FreeRTOS/Source/include/timers.h:
+
+FreeRTOS/Source/include/task.h:
+
+FreeRTOS/Source/include/event_groups.h:
+
+FreeRTOS/Source/include/timers.h:

@@ -1,0 +1,195 @@
+VisualGDB/Debug/nrf_tx_project.o: nrf_tx_project.c \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_bus.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Device/ST/STM32F1xx/Include/stm32f1xx.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Device/ST/STM32F1xx/Include/stm32f103xb.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Core/Include/core_cm3.h \
+ c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdint.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\stdint.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_default_types.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\features.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\_newlib_version.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_intsup.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_stdint.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Core/Include/cmsis_version.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Core/Include/cmsis_compiler.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Core/Include/cmsis_gcc.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Device/ST/STM32F1xx/Include/system_stm32f1xx.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_gpio.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_spi.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_exti.h \
+ C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_utils.h \
+ STM32_COMM_LIBS/CL_CONFIG.h STM32_COMM_LIBS/CL_printMsg.h \
+ STM32_COMM_LIBS/CL_CONFIG.h \
+ c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdbool.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\stdio.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\_ansi.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\newlib.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\config.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\ieeefp.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\cdefs.h \
+ c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stddef.h \
+ c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdarg.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\reent.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\_ansi.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_types.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_types.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\lock.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\types.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\endian.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_endian.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\select.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_sigset.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_timeval.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\timespec.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_timespec.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_pthreadtypes.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\sched.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\types.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\stdio.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\string.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_locale.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\strings.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\string.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\stdlib.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\stdlib.h \
+ c:\sysgcc\arm-eabi\arm-none-eabi\include\alloca.h \
+ STM32_COMM_LIBS/CL_systemClockUpdate.h STM32_COMM_LIBS/CL_nrf24l01p.h \
+ FreeRTOS/Source/include/FreeRTOS.h \
+ FreeRTOS/Source/include/FreeRTOSConfig.h \
+ FreeRTOS/Source/include/projdefs.h FreeRTOS/Source/include/portable.h \
+ FreeRTOS/Source/include/deprecated_definitions.h \
+ FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h \
+ FreeRTOS/Source/include/mpu_wrappers.h FreeRTOS/Source/include/task.h \
+ FreeRTOS/Source/include/list.h
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_bus.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Device/ST/STM32F1xx/Include/stm32f1xx.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Device/ST/STM32F1xx/Include/stm32f103xb.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Core/Include/core_cm3.h:
+
+c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdint.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\stdint.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_default_types.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\features.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\_newlib_version.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_intsup.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_stdint.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Core/Include/cmsis_version.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Core/Include/cmsis_compiler.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Core/Include/cmsis_gcc.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/CMSIS_HAL/Device/ST/STM32F1xx/Include/system_stm32f1xx.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_gpio.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_spi.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_exti.h:
+
+C:/Users/amaya/AppData/Local/VisualGDB/EmbeddedBSPs/arm-eabi/com.sysprogs.arm.stm32/STM32F1xxxx/STM32F1xx_HAL_Driver/Inc/stm32f1xx_ll_utils.h:
+
+STM32_COMM_LIBS/CL_CONFIG.h:
+
+STM32_COMM_LIBS/CL_printMsg.h:
+
+STM32_COMM_LIBS/CL_CONFIG.h:
+
+c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdbool.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\stdio.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\_ansi.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\newlib.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\config.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\ieeefp.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\cdefs.h:
+
+c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stddef.h:
+
+c:\sysgcc\arm-eabi\lib\gcc\arm-none-eabi\9.3.1\include\stdarg.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\reent.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\_ansi.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_types.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_types.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\lock.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\types.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\endian.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\_endian.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\select.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_sigset.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_timeval.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\timespec.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_timespec.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_pthreadtypes.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\sched.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\types.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\stdio.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\string.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\_locale.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\strings.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\sys\string.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\stdlib.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\machine\stdlib.h:
+
+c:\sysgcc\arm-eabi\arm-none-eabi\include\alloca.h:
+
+STM32_COMM_LIBS/CL_systemClockUpdate.h:
+
+STM32_COMM_LIBS/CL_nrf24l01p.h:
+
+FreeRTOS/Source/include/FreeRTOS.h:
+
+FreeRTOS/Source/include/FreeRTOSConfig.h:
+
+FreeRTOS/Source/include/projdefs.h:
+
+FreeRTOS/Source/include/portable.h:
+
+FreeRTOS/Source/include/deprecated_definitions.h:
+
+FreeRTOS/Source/portable/GCC/ARM_CM3/portmacro.h:
+
+FreeRTOS/Source/include/mpu_wrappers.h:
+
+FreeRTOS/Source/include/task.h:
+
+FreeRTOS/Source/include/list.h:

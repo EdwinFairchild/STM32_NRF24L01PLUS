@@ -1,0 +1,5 @@
+﻿  nrf_tx_project.c
+  Linking VisualGDB/Debug/nrf_tx_project...
+  ------------------- Memory utilization report -------------------
+  Used FLASH: 11KB out of 64KB (18%) [+52]
+  Used SRAM: 17KB out of 20KB (89%) [+104]
